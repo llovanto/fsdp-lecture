@@ -34,7 +34,8 @@ layout: two-cols-header
 - DDP recap
 - Mixed precision recap
 - FSDP basics
-- Prefetching
+- Memory usage
+- Communication overlap
 - Sharding strategies
 - HSDP
 - Resharding to a smaller world size
@@ -339,6 +340,8 @@ FlatParameter, complex, bloated, buggy
 
 # FSDP implementations
 
+<br>
+
 ## FSDP2
 
 Per parameter sharding, clean, performant
@@ -347,15 +350,31 @@ Per parameter sharding, clean, performant
 
 FSDP2 rewrite with flat sharding (and so less overhead)
 
+## SimpleFSDP
+
+Compile native implementation with compile-time bucketing
+
+## Deepspeed-ZeRO
+
+The og one, but not so performant
+
 ---
 
 # Recap
 
 FSDP is a data parallelism strategy with parameter sharding which:
 
-- reduces memory consumption
-- (ideally) has no performance overhead
+- reduces memory consumption (a lot compared to DDP)
+- has 1.5 times more communications compared to DDP
+- but (ideally) has no performance overhead
 - is used in (almost) every large-scale distributed training recipe
+
+<!-- Compared to DDP:
+
+- master weights, grads and optimizer states are sharded (**less memory overhead**)
+- weights are unsharded before forward / backward and resharded after
+- grads are reduced (and sharded) after backward
+- per-parameter communications are grouped for better network utilization -->
 
 ---
 layout: statement
