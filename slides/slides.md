@@ -6,6 +6,27 @@ transition: slide-left
 # FSDP (Fully Sharded Data Parallel)
 
 ---
+layout: two-cols-header
+---
+
+# About me
+
+::left::
+
+<br>
+<br>
+
+- MSU finished (haha)
+- разработчик в команде инфраструктуры обучения YandexGPT
+- мэйнтейнер YaFSDP (по возможности)
+
+::right::
+
+<br>
+
+<img border="rounded" src="./assets/cat.webp" alt="" width="700">
+
+---
 
 # Plan
 
@@ -21,8 +42,12 @@ transition: slide-left
 - FSDP implementations
 
 ---
+layout: two-cols-header
+---
 
 # Collective ops intro - `torch.distributed`
+
+::left::
 
 - Process groups: 1 GPU - 1 process
 - Distributed training requires inter-process communication ops:
@@ -31,6 +56,10 @@ transition: slide-left
   - `ReduceScatter`
   - ...
 - Backends implement these ops: NCCL for GPUs, GLOO for CPUs, etc.
+
+::right::
+
+<img border="rounded" src="./assets/process_group.jpg" alt="">
 
 ---
 
@@ -60,7 +89,9 @@ transition: slide-left
 
 # DDP recap
 
-<img border="rounded" src="./assets/ddp.png" alt="" width="700">
+<br>
+
+<img border="rounded" src="./assets/ddp.png" alt="">
 
 ---
 
@@ -75,43 +106,76 @@ transition: slide-left
 <img border="rounded" src="./assets/mixed_precision.png" alt="">
 
 ---
-layout: center
+layout: section
 ---
 
 # Fully Sharded Data Parallel
 
 ---
+layout: two-cols-header
+---
 
 # Fully SHARDED Data Parallel
 
+::left::
+
 Huge models don't fit into one GPU.
 
-Compared to DDP:
+Lets shard something!
+
+We shard:
+
+- weights
+- gradients
+- optimizer states
+
+<!-- Compared to DDP:
 
 - master weights, grads and optimizer states are sharded (**less memory overhead**)
 - weights are unsharded before forward / backward and resharded after
 - grads are reduced (and sharded) after backward
-- per-parameter communications are grouped for better network utilization
+- per-parameter communications are grouped for better network utilization -->
+
+::right::
 
 <br>
 
-<img border="rounded" src="./assets/tensor_sharding.jpg" alt="" width="300">
+<img border="rounded" src="./assets/tensor_sharding.jpg" alt="">
+
+<!--
+- каждый ранк отвечает за свой кусочек параметра
+-->
+
+---
+
+# FSDP - forward
+
+<img border="rounded" src="./assets/dp_zero3_fwd.png" alt="">
+
+---
+
+# FSDP - backward
+
+<img border="rounded" src="./assets/dp_zero3_bwd.png" alt="">
 
 ---
 
 # FSDP - overview
+
+<br>
+<br>
 
 <img border="rounded" src="./assets/fsdp.png" alt="">
 
 ---
 
-# FSDP - overview
+# FSDPUnit
 
 <img border="rounded" src="./assets/fsdp_multi.png" alt="">
 
 ---
 
-# FSDP - memory consumption (LLama 70B on 128 GPUs)
+# FSDP - memory usage (LLama 70B on 128 GPUs)
 
 Assuming per-transformer-block sharding.
 
@@ -126,7 +190,7 @@ Params per block (80 blocks):
 
 ---
 
-# FSDP - memory consumption (LLama 70B on 128 GPUs)
+# FSDP - memory usage (LLama 70B on 128 GPUs)
 
 Sharded states (in `fp32`):
 
@@ -149,7 +213,7 @@ Not too bad! (compared to DDP with `4 * 70B * 4 bytes = 1.1TB`)
 
 ---
 
-# FSDP - memory consumption (LLama 70B on 1024 GPUs)
+# FSDP - memory usage (LLama 70B on 1024 GPUs)
 
 Sharded states (in `fp32`):
 
@@ -172,31 +236,27 @@ Great!
 
 ---
 
-# Prefetching - DDP
+# FSDP - memory usage
 
-<br>
-<br>
-<br>
-<br>
-
-<img border="rounded" src="./assets/ddp_overlap.png" alt="">
+<img border="rounded" src="./assets/memory_usage.png" alt="">
 
 ---
 
-# Prefetching - FSDP
+# Communication overlap - DDP
 
-<img border="rounded" src="./assets/fsdp.png" alt="">
+<br>
+<br>
+
+<img border="rounded" src="./assets/ddp_overlap.svg" alt="">
 
 ---
 
-# Prefetching - FSDP
+# Communication overlap - FSDP
 
 <br>
 <br>
-<br>
-<br>
 
-<img border="rounded" src="./assets/fsdp_overlap.png" alt="">
+<img border="rounded" src="./assets/fsdp_overlap.svg" alt="">
 
 ---
 
@@ -210,28 +270,34 @@ Great!
 <img border="rounded" src="./assets/fsdp_comm2.png" alt="" width="700">
 
 ---
+layout: section
+---
+
+# How to balance memory / comm overhead
+
+---
 
 # Sharding strategies - ZeRO
+
+<br>
 
 <img border="rounded" src="./assets/zero_memory.png" alt="">
 
 ---
 
-# HSDP - Hybrid sharding
-
-<img border="rounded" src="./assets/hsdp.avif" alt="" width="650">
-
----
-
-# HSDP - Hybrid sharding
-
-<img border="rounded" src="./assets/hsdp_fsdp.png" alt="">
-
----
-
 # HSDP - Hybrid sharding (motivation)
 
+<br>
+
 <img border="rounded" src="./assets/topology.png" alt="">
+
+---
+
+# HSDP - Hybrid sharding
+
+<br>
+
+<img border="rounded" src="./assets/hsdp_fsdp.png" alt="">
 
 ---
 
@@ -245,7 +311,7 @@ world size:
 
 <br>
 
-<img border="rounded" src="./assets/fsdp.png" alt="" width="600">
+<img border="rounded" src="./assets/fsdp.png" alt="" width="800">
 
 ---
 
@@ -290,3 +356,11 @@ FSDP is a data parallelism strategy with parameter sharding which:
 - reduces memory consumption
 - (ideally) has no performance overhead
 - is used in (almost) every large-scale distributed training recipe
+
+---
+layout: statement
+---
+
+# We are hiring!
+
+## DM `@lovanto` on Telegram for details
