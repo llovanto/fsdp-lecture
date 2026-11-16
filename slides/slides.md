@@ -5,6 +5,8 @@ transition: slide-left
 
 # FSDP (Fully Sharded Data Parallel)
 
+*FSDP (здесь и далее) продукт Meta — признана экстремистской организацией и запрещена на территории Российской Федерации.
+
 ---
 layout: two-cols-header
 ---
@@ -161,18 +163,18 @@ We shard:
 
 ---
 
+# FSDPUnit
+
+<img border="rounded" src="./assets/fsdp_multi.png" alt="">
+
+---
+
 # FSDP - overview
 
 <br>
 <br>
 
 <img border="rounded" src="./assets/fsdp.png" alt="">
-
----
-
-# FSDPUnit
-
-<img border="rounded" src="./assets/fsdp_multi.png" alt="">
 
 ---
 
@@ -286,6 +288,12 @@ layout: section
 
 ---
 
+# ZeRO - memory usage
+
+<img border="rounded" src="./assets/memory_usage.png" alt="">
+
+---
+
 # HSDP - Hybrid sharding (motivation)
 
 <br>
@@ -375,11 +383,3 @@ FSDP is a data parallelism strategy with parameter sharding which:
 - weights are unsharded before forward / backward and resharded after
 - grads are reduced (and sharded) after backward
 - per-parameter communications are grouped for better network utilization -->
-
----
-layout: statement
----
-
-# We are hiring!
-
-## DM `@lovanto` on Telegram for details
